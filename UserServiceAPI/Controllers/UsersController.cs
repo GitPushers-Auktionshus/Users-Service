@@ -9,6 +9,7 @@ using MongoDB.Bson;
 using System.Text;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Authorization;
+using BCrypt;
 
 namespace UserServiceAPI.Controllers;
 
@@ -58,7 +59,7 @@ public class UserController : ControllerBase
             Address = newUser.Address,
             Phone = newUser.Phone,
             Email = newUser.Email,
-            Password = newUser.Password,
+            Password = HashPassword(newUser.Password),
             Verified = newUser.Verified,
             Rating = newUser.Rating,
             Username = newUser.Username
@@ -69,5 +70,13 @@ public class UserController : ControllerBase
         return;
     }
 
+    // Method for password hashing.
+    // Using BCrypt package to salt and hash a password string.
+    public static string HashPassword(string password)
+    {
+        string salt = BCryptHelper.GenerateSalt();
+        string hashedPassword = BCryptHelper.HashPassword(password, salt);
+        return hashedPassword;
+    }
 
 }
