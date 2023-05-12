@@ -1,4 +1,14 @@
+using System.Runtime.Serialization;
+using System.Threading;
+using System.Collections.Generic;
+using System;
+using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Driver;
+using MongoDB.Bson;
+using System.Text;
+using Microsoft.AspNetCore.Connections;
+using Microsoft.AspNetCore.Authorization;
 
 namespace UserServiceAPI.Controllers;
 
@@ -8,7 +18,7 @@ public class UserController : ControllerBase
 {
     private readonly ILogger<UserController> _logger;
     private readonly IConfiguration _config;
-    private readonly IMongoCollection<User> _users;
+    private readonly IMongoCollection<User> _user;
     private readonly string _secret;
     private readonly string _issuer;
 
@@ -29,11 +39,33 @@ public class UserController : ControllerBase
         _logger.LogInformation($"[*] DATABASE: {_config["DatabaseName"]}");
 
         // Collection
-        _users = database.GetCollection<User>(_config["CollectionName"]);
+        _user = database.GetCollection<User>(_config["CollectionName"]);
         _logger.LogInformation($"[*] COLLECTION: {_config["CollectionName"]}");
     }
 
+    [HttpPost("addUser")]
+    public async Task addUser(UserDTO newUser)
+    {
+        _logger.LogInformation($"newUser modtaget:\nFull name: {newUser.FirstName} {newUser.LastName}\nPhone: {newUser.Phone}\nUsername: {newUser.Username}\nAddress: {newUser.Address}\nEmail: {newUser.Email}\nPassword: {newUser.Password}\nVerified: {newUser.Verified}\nRating: {newUser.Rating}");
 
+        User user = new User
+        {
+            UserId = ObjectId.GenerateNewId().ToString(),
+            FirstName = newUser.FirstName,
+            LastName = newUser.LastName,
+            Address = newUser.Address,
+            Phone = newUser.Phone,
+            Email = newUser.Email,
+            Password = newUser.Password,
+            Verified = newUser.Verified,
+            Rating = newUser.Rating,
+            Username = newUser.Username
+        };
+
+        await _user.InsertOneAsync(user);
+
+        return;
+    }
 
 
 }
