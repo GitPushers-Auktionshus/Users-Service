@@ -43,6 +43,8 @@ public class UserController : ControllerBase
         _logger.LogInformation($"[*] COLLECTION: {_config["CollectionName"]}");
     }
 
+    // POST
+    // Adds a user to the database.
     [HttpPost("addUser")]
     public async Task addUser(UserDTO newUser)
     {
