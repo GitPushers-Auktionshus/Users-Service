@@ -4,26 +4,22 @@ using System.Collections.Generic;
 using System;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using MongoDB.Bson;
-using System.Text;
-using Microsoft.AspNetCore.Connections;
-using Microsoft.AspNetCore.Authorization;
-using BCrypt.Net;
+using System;
 
-namespace UsersServiceAPI.Controllers;
+namespace UsersServiceAPI.Service;
 
-[ApiController]
-[Route("[controller]")]
-public class UsersController : ControllerBase
+public class MongoDBService
 {
-    private readonly ILogger<UsersController> _logger;
+    private readonly IMongoCollection<User> _userCollection;
     private readonly IConfiguration _config;
-    private readonly IMongoCollection<User> _user;
+    private readonly ILogger<MongoDBService> _logger;
     private readonly string _secret;
     private readonly string _issuer;
 
-    public UsersController(ILogger<UsersController> logger, IConfiguration config)
+    public MongoDBService(IConfiguration config, ILogger<MongoDBService> logger)
     {
         _logger = logger;
         _config = config;
@@ -40,18 +36,17 @@ public class UsersController : ControllerBase
         _logger.LogInformation($"[*] DATABASE: {_config["DatabaseName"]}");
 
         // Collection
-        _user = database.GetCollection<User>(_config["CollectionName"]);
+        _userCollection = database.GetCollection<User>(_config["CollectionName"]);
         _logger.LogInformation($"[*] COLLECTION: {_config["CollectionName"]}");
     }
 
-    // GET - Fetches a user from the database by UserId
-    [HttpGet("getUser/{userId}")]
-    public ActionResult<User> getUser(string userId)
+    // Method to fetch a specific user from the userId.
+    public async Task<User> GetUserById(string userId)
     {
         try
         {
             // Finds a user in the database with the same UserId as the input parameter.
-            var user = _user.Find(u => u.UserId == userId).FirstOrDefault();
+            var user = await _userCollection.Find(u => u.UserId == userId).FirstOrDefaultAsync();
 
             _logger.LogInformation($"[*] Fetching user information from userId: {user.UserId}");
 
@@ -59,18 +54,17 @@ public class UsersController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError("[*] User with the specified ID not found.");
+            _logger.LogError($"Exception caught: {ex}");
             throw;
         }
     }
 
-
-    // POST - Adds a user to the database.
-    [HttpPost("addUser")]
-    public async Task addUser(UserDTO newUser)
+    // Method to add a new user to the database.
+    public async Task AddNewUser(UserDTO newUser)
     {
         try
         {
+            // Converts the UserDTO to a regular User object.
             User user = new User
             {
                 UserId = ObjectId.GenerateNewId().ToString(),
@@ -81,28 +75,26 @@ public class UsersController : ControllerBase
                 Email = newUser.Email,
                 Password = HashPassword(newUser.Password),
                 Verified = newUser.Verified,
-                Rating = Math.Round(newUser.Rating, 2),
+                Rating = Math.Round(newUser.Rating, 2), // Converts float to use only 1 decimal.
                 Username = newUser.Username
             };
 
             // Logging userinformation.
             _logger.LogInformation($"[*] New user added:\nUserId: {user.UserId}\nFull name: {user.FirstName} {user.LastName}\nPhone: {user.Phone}\nUsername: {user.Username}\nAddress: {user.Address}\nEmail: {user.Email}\nPassword: {user.Password}\nVerified: {user.Verified}\nRating: {user.Rating}");
 
-            // Inserts into user-collection.
-            await _user.InsertOneAsync(user);
+            await _userCollection.InsertOneAsync(user);
 
-            return; 
+            return;
         }
         catch (Exception ex)
         {
-            _logger.LogError("[*] Couldn't add a new user to the database.");
+            _logger.LogError($"Exception caught: {ex}");
             throw;
         }
-
     }
 
     // Method for password hashing.
-    // Using BCrypt package to salt and hash a password string.
+    // Using BCrypt-package to salt and hash a password string.
     public static string HashPassword(string password)
     {
         string salt = BCrypt.Net.BCrypt.GenerateSalt();
@@ -110,5 +102,4 @@ public class UsersController : ControllerBase
 
         return hashedPassword;
     }
-
 }
