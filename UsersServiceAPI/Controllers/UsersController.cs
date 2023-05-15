@@ -44,6 +44,13 @@ public class UsersController : ControllerBase
 
     }
 
+    // GET - Fetches all users from the database.
+    [HttpGet("getAllUsers")]
+    public async Task<List<User>> GetAll()
+    {
+        return await _mongoService.GetAllUsers();
+    }
+
     // POST - Adds a user to the database.
     [HttpPost("addUser")]
     public async Task<IActionResult> AddUser(UserDTO newUser)

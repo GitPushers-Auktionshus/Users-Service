@@ -59,6 +59,12 @@ public class MongoDBService
         }
     }
 
+    // Method to fetch all users from the database.
+    public async Task<List<User>> GetAllUsers()
+    {
+        return await _userCollection.Find(new BsonDocument()).ToListAsync();
+    }
+
     // Method to add a new user to the database.
     public async Task AddNewUser(UserDTO newUser)
     {
