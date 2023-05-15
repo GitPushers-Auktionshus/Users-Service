@@ -9,6 +9,7 @@ using MongoDB.Bson;
 using System.Text;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Authorization;
+using BCrypt.Net;
 
 namespace UserServiceAPI.Controllers;
 
@@ -48,26 +49,46 @@ public class UserController : ControllerBase
     [HttpPost("addUser")]
     public async Task addUser(UserDTO newUser)
     {
-        _logger.LogInformation($"newUser modtaget:\nFull name: {newUser.FirstName} {newUser.LastName}\nPhone: {newUser.Phone}\nUsername: {newUser.Username}\nAddress: {newUser.Address}\nEmail: {newUser.Email}\nPassword: {newUser.Password}\nVerified: {newUser.Verified}\nRating: {newUser.Rating}");
-
-        User user = new User
+        try
         {
-            UserId = ObjectId.GenerateNewId().ToString(),
-            FirstName = newUser.FirstName,
-            LastName = newUser.LastName,
-            Address = newUser.Address,
-            Phone = newUser.Phone,
-            Email = newUser.Email,
-            Password = newUser.Password,
-            Verified = newUser.Verified,
-            Rating = newUser.Rating,
-            Username = newUser.Username
-        };
+            User user = new User
+            {
+                UserId = ObjectId.GenerateNewId().ToString(),
+                FirstName = newUser.FirstName,
+                LastName = newUser.LastName,
+                Address = newUser.Address,
+                Phone = newUser.Phone,
+                Email = newUser.Email,
+                Password = HashPassword(newUser.Password),
+                Verified = newUser.Verified,
+                Rating = Math.Round(newUser.Rating, 2),
+                Username = newUser.Username
+            };
 
-        await _user.InsertOneAsync(user);
+            // Logging userinformation.
+            _logger.LogInformation($"newUser modtaget:\nUserId: {user.UserId}\nFull name: {user.FirstName} {user.LastName}\nPhone: {user.Phone}\nUsername: {user.Username}\nAddress: {user.Address}\nEmail: {user.Email}\nPassword: {user.Password}\nVerified: {user.Verified}\nRating: {user.Rating}");
 
-        return;
+            // Inserts into user-collection.
+            await _user.InsertOneAsync(user);
+
+            return; 
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("Couldn't add a new user to the database.");
+            throw;
+        }
+
     }
 
+    // Method for password hashing.
+    // Using BCrypt package to salt and hash a password string.
+    public static string HashPassword(string password)
+    {
+        string salt = BCrypt.Net.BCrypt.GenerateSalt();
+        string hashedPassword = BCrypt.Net.BCrypt.HashPassword(password, salt);
+
+        return hashedPassword;
+    }
 
 }
