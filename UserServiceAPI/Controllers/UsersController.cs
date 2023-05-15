@@ -44,6 +44,20 @@ public class UserController : ControllerBase
         _logger.LogInformation($"[*] COLLECTION: {_config["CollectionName"]}");
     }
 
+    // GET
+    // Gets a user by Id
+    [HttpPost("getUser/{id}")]
+    public ActionResult<User> getUser(string id)
+    {
+        
+        var filter = Builders<User>.Filter.Eq(u => u.UserId, id);
+
+        var user = _user.Find(filter).FirstOrDefault();
+
+        return Ok(User);
+    }
+
+
     // POST
     // Adds a user to the database.
     [HttpPost("addUser")]
