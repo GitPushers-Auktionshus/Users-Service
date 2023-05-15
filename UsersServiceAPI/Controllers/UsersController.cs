@@ -41,7 +41,13 @@ public class UsersController : ControllerBase
     public async Task<User> GetUser(string userId)
     {
         return await _mongoService.GetUserById(userId);
+    }
 
+    // GET - Fetches all users from the database.
+    [HttpGet("getAllUsers")]
+    public async Task<List<User>> GetAll()
+    {
+        return await _mongoService.GetAllUsers();
     }
 
     // POST - Adds a user to the database.
@@ -51,7 +57,6 @@ public class UsersController : ControllerBase
         await _mongoService.AddNewUser(newUser);
 
         return Ok("New user has been added to the database.");
-
     }
 
 
