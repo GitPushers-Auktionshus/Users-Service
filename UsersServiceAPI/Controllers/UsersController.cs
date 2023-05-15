@@ -20,13 +20,13 @@ public class UsersController : ControllerBase
 {
     private readonly ILogger<UsersController> _logger;
     private readonly IConfiguration _config;
-    private readonly IMongoCollection<User> _user;
     private readonly string _secret;
     private readonly string _issuer;
     private readonly MongoDBService _mongoService;
 
     public UsersController(ILogger<UsersController> logger, IConfiguration config, MongoDBService mongoService)
     {
+        // Injects MongoService into the controller constructor
         _mongoService = mongoService;
 
         _logger = logger;
