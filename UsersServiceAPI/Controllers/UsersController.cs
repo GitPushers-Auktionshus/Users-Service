@@ -10,6 +10,7 @@ using System.Text;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Authorization;
 using BCrypt.Net;
+using UsersServiceAPI.Service;
 
 namespace UsersServiceAPI.Controllers;
 
@@ -22,46 +23,54 @@ public class UsersController : ControllerBase
     private readonly IMongoCollection<User> _user;
     private readonly string _secret;
     private readonly string _issuer;
+    private readonly MongoDBService _mongoService;
 
-    public UsersController(ILogger<UsersController> logger, IConfiguration config)
+    public UsersController(ILogger<UsersController> logger, IConfiguration config, MongoDBService mongoService)
     {
+        _mongoService = mongoService;
+
         _logger = logger;
         _config = config;
 
         _secret = config["Secret"] ?? "Secret missing";
         _issuer = config["Issuer"] ?? "Issue'er missing";
 
-        // Client
-        var mongoClient = new MongoClient(_config["ConnectionURI"]);
-        _logger.LogInformation($"[*] CONNECTION_URI: {_config["ConnectionURI"]}");
+        // // Client
+        // var mongoClient = new MongoClient(_config["ConnectionURI"]);
+        // _logger.LogInformation($"[*] CONNECTION_URI: {_config["ConnectionURI"]}");
 
-        // Database
-        var database = mongoClient.GetDatabase(_config["DatabaseName"]);
-        _logger.LogInformation($"[*] DATABASE: {_config["DatabaseName"]}");
+        // // Database
+        // var database = mongoClient.GetDatabase(_config["DatabaseName"]);
+        // _logger.LogInformation($"[*] DATABASE: {_config["DatabaseName"]}");
 
-        // Collection
-        _user = database.GetCollection<User>(_config["CollectionName"]);
-        _logger.LogInformation($"[*] COLLECTION: {_config["CollectionName"]}");
+        // // Collection
+        // _user = database.GetCollection<User>(_config["CollectionName"]);
+        // _logger.LogInformation($"[*] COLLECTION: {_config["CollectionName"]}");
     }
 
-    // GET - Fetches a user from the database by UserId
+    // // GET - Fetches a user from the database by UserId
+    // [HttpGet("getUser/{userId}")]
+    // public ActionResult<User> getUser(string userId)
+    // {
+    //     try
+    //     {
+    //         // Finds a user in the database with the same UserId as the input parameter.
+    //         var user = _user.Find(u => u.UserId == userId).FirstOrDefault();
+
+    //         _logger.LogInformation($"[*] Fetching user information from userId: {user.UserId}");
+
+    //         return user;
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         _logger.LogError("[*] User with the specified ID not found.");
+    //         throw;
+    //     }
+    // }
     [HttpGet("getUser/{userId}")]
-    public ActionResult<User> getUser(string userId)
+    public User getUser(string userId)
     {
-        try
-        {
-            // Finds a user in the database with the same UserId as the input parameter.
-            var user = _user.Find(u => u.UserId == userId).FirstOrDefault();
-
-            _logger.LogInformation($"[*] Fetching user information from userId: {user.UserId}");
-
-            return user;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError("[*] User with the specified ID not found.");
-            throw;
-        }
+        return _mongoService.getUserById(userId);
     }
 
 
@@ -71,6 +80,7 @@ public class UsersController : ControllerBase
     {
         try
         {
+            // Converts the UserDTO to a regular User object.
             User user = new User
             {
                 UserId = ObjectId.GenerateNewId().ToString(),

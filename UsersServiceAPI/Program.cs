@@ -1,4 +1,9 @@
+using UsersServiceAPI;
+using UsersServiceAPI.Service;
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddSingleton<MongoDBService>();
 
 // Add services to the container.
 
