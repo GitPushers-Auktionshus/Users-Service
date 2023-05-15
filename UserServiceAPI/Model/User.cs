@@ -16,7 +16,7 @@ public class User
         public string? Email { get; set; }
         public string? Password { get; set; }
         public bool Verified { get; set; }
-        public float Rating { get; set; }
+        public double Rating { get; set; }
         public string? Username { get; set; }
 
         public User()
