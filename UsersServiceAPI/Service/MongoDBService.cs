@@ -48,13 +48,13 @@ public class MongoDBService
             // Finds a user in the database with the same UserId as the input parameter.
             var user = await _userCollection.Find(u => u.UserId == userId).FirstOrDefaultAsync();
 
-            _logger.LogInformation($"[*] Fetching user information from userId: {user.UserId}");
+            _logger.LogInformation($"[*] GetUserById(string userId) called: Fetching user information from userId: {user.UserId}");
 
             return user;
         }
         catch (Exception ex)
         {
-            _logger.LogError($"Exception caught: {ex}");
+            _logger.LogError($"EXCEPTION CAUGHT: {ex.Message}");
             throw;
         }
     }
@@ -62,7 +62,18 @@ public class MongoDBService
     // Method to fetch all users from the database.
     public async Task<List<User>> GetAllUsers()
     {
-        return await _userCollection.Find(new BsonDocument()).ToListAsync();
+        try
+        {
+            _logger.LogInformation($"[*] GetAllUsers() called: Fetching all users from the database.");
+
+            // Finds all users in the database and converts it to a list.
+            return await _userCollection.Find(new BsonDocument()).ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"EXCEPTION CAUGHT: {ex.Message}");
+            throw;
+        }
     }
 
     // Method to add a new user to the database.
@@ -70,6 +81,8 @@ public class MongoDBService
     {
         try
         {
+            _logger.LogInformation($"[*] AddNewUser(UserDTO newUser) called: Creating a new user.");
+
             // Converts the UserDTO to a regular User object.
             User user = new User
             {
@@ -94,7 +107,7 @@ public class MongoDBService
         }
         catch (Exception ex)
         {
-            _logger.LogError($"Exception caught: {ex}");
+            _logger.LogError($"EXCEPTION CAUGHT: {ex.Message}");
             throw;
         }
     }
