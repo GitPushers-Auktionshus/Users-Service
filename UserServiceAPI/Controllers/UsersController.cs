@@ -11,19 +11,19 @@ using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Authorization;
 using BCrypt.Net;
 
-namespace UserServiceAPI.Controllers;
+namespace UsersServiceAPI.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class UserController : ControllerBase
+public class UsersController : ControllerBase
 {
-    private readonly ILogger<UserController> _logger;
+    private readonly ILogger<UsersController> _logger;
     private readonly IConfiguration _config;
     private readonly IMongoCollection<User> _user;
     private readonly string _secret;
     private readonly string _issuer;
 
-    public UserController(ILogger<UserController> logger, IConfiguration config)
+    public UsersController(ILogger<UsersController> logger, IConfiguration config)
     {
         _logger = logger;
         _config = config;
@@ -44,8 +44,28 @@ public class UserController : ControllerBase
         _logger.LogInformation($"[*] COLLECTION: {_config["CollectionName"]}");
     }
 
-    // POST
-    // Adds a user to the database.
+    // GET - Fetches a user from the database by UserId
+    [HttpGet("getUser/{userId}")]
+    public ActionResult<User> getUser(string userId)
+    {
+        try
+        {
+            // Finds a user in the database with the same UserId as the input parameter.
+            var user = _user.Find(u => u.UserId == userId).FirstOrDefault();
+
+            _logger.LogInformation($"[*] Fetching user information from userId: {user.UserId}");
+
+            return user;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("[*] User with the specified ID not found.");
+            throw;
+        }
+    }
+
+
+    // POST - Adds a user to the database.
     [HttpPost("addUser")]
     public async Task addUser(UserDTO newUser)
     {
@@ -66,7 +86,7 @@ public class UserController : ControllerBase
             };
 
             // Logging userinformation.
-            _logger.LogInformation($"newUser modtaget:\nUserId: {user.UserId}\nFull name: {user.FirstName} {user.LastName}\nPhone: {user.Phone}\nUsername: {user.Username}\nAddress: {user.Address}\nEmail: {user.Email}\nPassword: {user.Password}\nVerified: {user.Verified}\nRating: {user.Rating}");
+            _logger.LogInformation($"[*] New user added:\nUserId: {user.UserId}\nFull name: {user.FirstName} {user.LastName}\nPhone: {user.Phone}\nUsername: {user.Username}\nAddress: {user.Address}\nEmail: {user.Email}\nPassword: {user.Password}\nVerified: {user.Verified}\nRating: {user.Rating}");
 
             // Inserts into user-collection.
             await _user.InsertOneAsync(user);
@@ -75,7 +95,7 @@ public class UserController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError("Couldn't add a new user to the database.");
+            _logger.LogError("[*] Couldn't add a new user to the database.");
             throw;
         }
 
