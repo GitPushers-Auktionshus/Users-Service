@@ -16,16 +16,11 @@ public class MongoDBService
     private readonly IMongoCollection<User> _userCollection;
     private readonly IConfiguration _config;
     private readonly ILogger<MongoDBService> _logger;
-    private readonly string _secret;
-    private readonly string _issuer;
 
     public MongoDBService(IConfiguration config, ILogger<MongoDBService> logger)
     {
         _logger = logger;
         _config = config;
-
-        _secret = config["Secret"] ?? "Secret missing";
-        _issuer = config["Issuer"] ?? "Issue'er missing";
 
         // Client
         var mongoClient = new MongoClient(_config["ConnectionURI"]);
@@ -116,7 +111,7 @@ public class MongoDBService
             };
 
             // Logging userinformation.
-            _logger.LogInformation($"[*] New user added:\nUserId: {user.UserId}\nFull name: {user.FirstName} {user.LastName}\nPhone: {user.Phone}\nUsername: {user.Username}\nAddress: {user.Address}\nEmail: {user.Email}\nPassword: {user.Password}\nVerified: {user.Verified}\nRating: {user.Rating}");
+            _logger.LogInformation($"\n[*] New user added:\nUserId: {user.UserId}\nFull name: {user.FirstName} {user.LastName}\nPhone: {user.Phone}\nUsername: {user.Username}\nAddress: {user.Address}\nEmail: {user.Email}\nPassword: {user.Password}\nVerified: {user.Verified}\nRating: {user.Rating}");
 
             await _userCollection.InsertOneAsync(user);
 

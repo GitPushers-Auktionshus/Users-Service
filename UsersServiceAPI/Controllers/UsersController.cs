@@ -21,8 +21,6 @@ public class UsersController : ControllerBase
 {
     private readonly ILogger<UsersController> _logger;
     private readonly IConfiguration _config;
-    private readonly string _secret;
-    private readonly string _issuer;
     private readonly MongoDBService _mongoService;
 
     public UsersController(ILogger<UsersController> logger, IConfiguration config, MongoDBService mongoService)
@@ -32,9 +30,6 @@ public class UsersController : ControllerBase
 
         _logger = logger;
         _config = config;
-
-        _secret = config["Secret"] ?? "Secret missing";
-        _issuer = config["Issuer"] ?? "Issue'er missing";
     }
 
     // GET - Fetches a user from the database by Id.
@@ -66,9 +61,8 @@ public class UsersController : ControllerBase
     {
         await _mongoService.AddNewUser(newUser);
 
-        return Ok("New user has been added to the database.");
+        return Ok($"New user has been added to the database: {newUser.FirstName} {newUser.LastName}");
     }
-
 
 
 }
