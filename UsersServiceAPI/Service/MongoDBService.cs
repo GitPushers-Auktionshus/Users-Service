@@ -76,6 +76,23 @@ public class MongoDBService
         }
     }
 
+    // Method to delete a user in the database
+    public async Task DeleteOneUser(string userId)
+    {
+        try
+        {
+            _logger.LogInformation($"[*] DeleteOneUser(string userId) called: Deleting a user from the database.");
+
+            // Finds a user with the input UserId and deletes it.
+            await _userCollection.DeleteOneAsync(u => u.UserId == userId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"EXCEPTION CAUGHT: {ex.Message}");
+            throw;          
+        }
+    }
+
     // Method to add a new user to the database.
     public async Task AddNewUser(UserDTO newUser)
     {

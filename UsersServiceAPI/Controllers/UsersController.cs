@@ -1,3 +1,4 @@
+using System.Net.Http.Headers;
 using System.Runtime.Serialization;
 using System.Threading;
 using System.Collections.Generic;
@@ -48,6 +49,15 @@ public class UsersController : ControllerBase
     public async Task<List<User>> GetAll()
     {
         return await _mongoService.GetAllUsers();
+    }
+
+    // DEL - Deletes a user from the databse by Id.
+    [HttpDelete("deleteUser/{userId}")]
+    public async Task<IActionResult> DeleteUser(string userId)
+    {
+        await _mongoService.DeleteOneUser(userId);
+
+        return Ok($"User with Id: {userId} has been deleted.");
     }
 
     // POST - Adds a user to the database.
