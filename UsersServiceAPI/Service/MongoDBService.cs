@@ -128,6 +128,42 @@ public class MongoDBService
         }
     }
 
+    // Method to update a users password.
+    public async Task UpdateUserPassword(string userId, UserDTO userDTO)
+    {
+        try
+        {
+            _logger.LogInformation($"[*] UpdateUserPassword(string userId, UserDTO userDTO) called: Updating a users password in the database.");
+
+            // Finds the user with the same UserId as the input Id.
+            User existingUser = await _userCollection.Find(u => u.UserId == userId).FirstOrDefaultAsync();
+
+            if (existingUser == null)
+            {
+                _logger.LogError($"No user with the given userId found.");
+                return;
+            }
+
+            _logger.LogInformation($"Old: {existingUser.Password}");
+
+            // Overwrites the current password with the new one
+            existingUser.Password = HashPassword(userDTO.Password);
+
+            _logger.LogInformation($"New: {existingUser.Password}");
+
+            // Updates the database with the new User object.
+            await _userCollection.ReplaceOneAsync(x => x.UserId == userId, existingUser);
+
+            return;
+
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"EXCEPTION CAUGHT: {ex.Message}");
+            throw;   
+        }
+    }
+
     // Method to add a new user to the database.
     public async Task AddNewUser(UserDTO newUser)
     {

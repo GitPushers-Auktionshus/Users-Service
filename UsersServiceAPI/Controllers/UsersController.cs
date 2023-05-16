@@ -64,6 +64,15 @@ public class UsersController : ControllerBase
         return Ok($"User with Id: {userId} has been updated in the database.");
     }
 
+    // PUT - Updates a users password by Id.
+    [HttpPut("updatePassword/{userId}")]
+    public async Task<IActionResult> UpdatePassword(string userId, UserDTO userDTO)
+    {
+        await _mongoService.UpdateUserPassword(userId, userDTO);
+
+        return Ok($"User with Id: {userId} has changed password");
+    }
+
     // POST - Adds a user to the database.
     [HttpPost("addUser")]
     public async Task<IActionResult> AddUser(UserDTO newUser)
