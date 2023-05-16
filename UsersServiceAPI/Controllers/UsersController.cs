@@ -55,6 +55,15 @@ public class UsersController : ControllerBase
         return Ok($"User with Id: {userId} has been deleted.");
     }
 
+    // PUT - Updates a users information by Id.
+    [HttpPut("updateUser/{userId}")]
+    public async Task<IActionResult> UpdateUser(string userId, UserDTO userDTO)
+    {
+        await _mongoService.UpdateOneUser(userId, userDTO);
+
+        return Ok($"User with Id: {userId} has been updated in the database.");
+    }
+
     // POST - Adds a user to the database.
     [HttpPost("addUser")]
     public async Task<IActionResult> AddUser(UserDTO newUser)

@@ -88,6 +88,46 @@ public class MongoDBService
         }
     }
 
+    // Method to update a user in the database.
+    public async Task UpdateOneUser(string userId, UserDTO userDTO)
+    {
+        try
+        {
+            _logger.LogInformation($"[*] UpdateOneUser(string userId, UserDTO userDTO) called: Updating a user in the database.");
+
+            // Finds the user with the same UserId as the input Id.
+            User existingUser = await _userCollection.Find(u => u.UserId == userId).FirstOrDefaultAsync();
+
+            if (existingUser == null)
+            {
+                _logger.LogError($"No user with the given userId found.");
+                return;
+            }
+
+            _logger.LogInformation($"The user has been updated:\nFirstName: {existingUser.FirstName} --> {userDTO.FirstName}\nLastName: {existingUser.LastName} --> {userDTO.LastName}\nAddress: {existingUser.Address} --> {userDTO.Address}\nPhone: {existingUser.Phone} --> {userDTO.Phone}\nEmail: {existingUser.Email} --> {userDTO.Email}\nVerified: {existingUser.Verified}  --> {userDTO.Verified}\nRating: {existingUser.Rating} --> {userDTO.Rating}\nUsername: {existingUser.Username} --> {userDTO.Username}");
+
+            // Overwrites the data in the object with the new userDTO object.
+            existingUser.FirstName = userDTO.FirstName;
+            existingUser.LastName = userDTO.LastName;
+            existingUser.Address = userDTO.Address;
+            existingUser.Phone = userDTO.Phone;
+            existingUser.Email = userDTO.Email;
+            existingUser.Verified = userDTO.Verified;
+            existingUser.Rating = Math.Round(userDTO.Rating, 2);
+            existingUser.Username = userDTO.Username;
+
+            // Replaces the User object in the database with the new object.
+            await _userCollection.ReplaceOneAsync(x => x.UserId == userId, existingUser);
+
+            return;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"EXCEPTION CAUGHT: {ex.Message}");
+            throw;   
+        }
+    }
+
     // Method to add a new user to the database.
     public async Task AddNewUser(UserDTO newUser)
     {
