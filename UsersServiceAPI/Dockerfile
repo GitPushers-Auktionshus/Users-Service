@@ -8,4 +8,4 @@ FROM mcr.microsoft.com/dotnet/aspnet:7.0-alpine as runtime
 
 WORKDIR /app
 COPY --from=build /app/published-app /app
-ENTRYPOINT ["dotnet", "/app/UserServiceAPI.dll"]
+ENTRYPOINT ["dotnet", "/app/UsersServiceAPI.dll"]

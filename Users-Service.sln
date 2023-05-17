@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserServiceAPI", "UserServiceAPI\UserServiceAPI.csproj", "{3AA75CE2-1156-4307-B8E0-894B7C2F604E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UsersServiceAPI", "UsersServiceAPI\UsersServiceAPI.csproj", "{3AA75CE2-1156-4307-B8E0-894B7C2F604E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserServiceAPI.Test", "UserServiceAPI.Test\UserServiceAPI.Test.csproj", "{6A11E5D4-BF10-4AB4-891F-94F9C25D5B66}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UsersServiceAPI.Test", "UsersServiceAPI.Test\UsersServiceAPI.Test.csproj", "{6A11E5D4-BF10-4AB4-891F-94F9C25D5B66}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
