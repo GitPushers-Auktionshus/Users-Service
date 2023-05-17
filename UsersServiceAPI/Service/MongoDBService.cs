@@ -11,7 +11,7 @@ using System;
 
 namespace UsersServiceAPI.Service;
 
-public class MongoDBService
+public class MongoDBService : IUserRepository
 {
     private readonly IMongoCollection<User> _userCollection;
     private readonly IConfiguration _config;
