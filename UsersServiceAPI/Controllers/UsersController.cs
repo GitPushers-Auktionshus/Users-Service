@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Authorization;
 using BCrypt.Net;
 using UsersServiceAPI.Service;
+using UsersServiceAPI.Model;
 
 namespace UsersServiceAPI.Controllers;
 

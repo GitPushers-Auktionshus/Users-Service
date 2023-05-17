@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using System;
 using UsersServiceAPI.Model;
 using Microsoft.AspNetCore.Mvc;
@@ -19,9 +17,7 @@ namespace UsersServiceAPI.Service
         public Task UpdateUserPassword(string userId, UserDTO userDTO);
 
         public Task AddNewUser(UserDTO newUser);
-
-        public string HashPassword(string password);
-
+        
     }
 
 }

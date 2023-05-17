@@ -2,6 +2,8 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using System.Collections.Generic;
 
+namespace UsersServiceAPI.Model;
+
 public class UserDTO
     {
         public string? FirstName { get; set; }

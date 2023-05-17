@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using MongoDB.Bson;
 using System;
+using UsersServiceAPI.Model;
 
 namespace UsersServiceAPI.Service;
 

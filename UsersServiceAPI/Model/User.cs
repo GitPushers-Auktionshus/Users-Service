@@ -5,6 +5,8 @@ using System.Globalization;
 using System.Runtime.Serialization;
 using System;
 
+namespace UsersServiceAPI.Model;
+
 public class User
     {
         [BsonId]
