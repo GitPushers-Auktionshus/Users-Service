@@ -3,7 +3,7 @@ using UsersServiceAPI.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddSingleton<MongoDBService>();
+builder.Services.AddSingleton<IUserRepository,MongoDBService>();
 
 // Add services to the container.
 

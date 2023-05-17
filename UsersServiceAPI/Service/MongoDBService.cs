@@ -8,10 +8,12 @@ using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using MongoDB.Bson;
 using System;
+using UsersServiceAPI.Model;
 
 namespace UsersServiceAPI.Service;
 
-public class MongoDBService
+// Inhertis from IUserRepository interface.
+public class MongoDBService : IUserRepository
 {
     private readonly IMongoCollection<User> _userCollection;
     private readonly IConfiguration _config;

@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Authorization;
 using BCrypt.Net;
 using UsersServiceAPI.Service;
+using UsersServiceAPI.Model;
 
 namespace UsersServiceAPI.Controllers;
 
@@ -21,9 +22,9 @@ public class UsersController : ControllerBase
 {
     private readonly ILogger<UsersController> _logger;
     private readonly IConfiguration _config;
-    private readonly MongoDBService _mongoService;
+    private readonly IUserRepository _mongoService;
 
-    public UsersController(ILogger<UsersController> logger, IConfiguration config, MongoDBService mongoService)
+    public UsersController(ILogger<UsersController> logger, IConfiguration config, IUserRepository mongoService)
     {
         // Injects MongoService into the controller constructor
         _mongoService = mongoService;
