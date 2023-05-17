@@ -12,6 +12,7 @@ using UsersServiceAPI.Model;
 
 namespace UsersServiceAPI.Service;
 
+// Inhertis from IUserRepository interface.
 public class MongoDBService : IUserRepository
 {
     private readonly IMongoCollection<User> _userCollection;
