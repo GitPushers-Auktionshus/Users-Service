@@ -80,7 +80,6 @@ public class UsersController : ControllerBase
     }
 
     // POST - Adds a user to the database.
-    [Authorize]
     [HttpPost("addUser")]
     public async Task<IActionResult> AddUser(UserDTO newUser)
     {
