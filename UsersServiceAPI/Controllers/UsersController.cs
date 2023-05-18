@@ -34,6 +34,7 @@ public class UsersController : ControllerBase
     }
 
     // GET - Fetches a user from the database by Id.
+    [Authorize]
     [HttpGet("getUser/{userId}")]
     public async Task<User> GetUser(string userId)
     {
@@ -41,6 +42,7 @@ public class UsersController : ControllerBase
     }
 
     // GET - Fetches all users from the database.
+    [Authorize]
     [HttpGet("getAllUsers")]
     public async Task<List<User>> GetAll()
     {
@@ -48,6 +50,7 @@ public class UsersController : ControllerBase
     }
 
     // DEL - Deletes a user from the databse by Id.
+    [Authorize]
     [HttpDelete("deleteUser/{userId}")]
     public async Task<IActionResult> DeleteUser(string userId)
     {
@@ -57,6 +60,7 @@ public class UsersController : ControllerBase
     }
 
     // PUT - Updates a users information by Id.
+    [Authorize]
     [HttpPut("updateUser/{userId}")]
     public async Task<IActionResult> UpdateUser(string userId, UserDTO userDTO)
     {
@@ -66,6 +70,7 @@ public class UsersController : ControllerBase
     }
 
     // PUT - Updates a users password by Id.
+    [Authorize]
     [HttpPut("updatePassword/{userId}")]
     public async Task<IActionResult> UpdatePassword(string userId, UserDTO userDTO)
     {
@@ -75,6 +80,7 @@ public class UsersController : ControllerBase
     }
 
     // POST - Adds a user to the database.
+    [Authorize]
     [HttpPost("addUser")]
     public async Task<IActionResult> AddUser(UserDTO newUser)
     {

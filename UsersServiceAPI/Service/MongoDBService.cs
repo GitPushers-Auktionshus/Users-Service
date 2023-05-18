@@ -15,26 +15,64 @@ namespace UsersServiceAPI.Service;
 // Inhertis from IUserRepository interface.
 public class MongoDBService : IUserRepository
 {
-    private readonly IMongoCollection<User> _userCollection;
     private readonly IConfiguration _config;
+
     private readonly ILogger<MongoDBService> _logger;
 
-    public MongoDBService(IConfiguration config, ILogger<MongoDBService> logger)
+    private readonly string _connectionURI;
+
+    private readonly string _usersDatabase;
+
+    private readonly string _userCollectionName;
+
+    private readonly IMongoCollection<User> _userCollection;
+
+    public MongoDBService(IConfiguration config, ILogger<MongoDBService> logger, EnviromentVariables vaultSecrets)
     {
         _logger = logger;
         _config = config;
 
-        // Client
-        var mongoClient = new MongoClient(_config["ConnectionURI"]);
-        _logger.LogInformation($"[*] CONNECTION_URI: {_config["ConnectionURI"]}");
+        try
+        {
+            // Retrieves enviroment variables from program.cs, from injected EnviromentVariables class
+            _connectionURI = vaultSecrets.dictionary["ConnectionURI"];
 
-        // Database
-        var database = mongoClient.GetDatabase(_config["DatabaseName"]);
-        _logger.LogInformation($"[*] DATABASE: {_config["DatabaseName"]}");
+            // Retrieves User database and collections
+            _usersDatabase = config["UserDatabase"] ?? "Auctionsdatabase missing";
+            _userCollectionName = config["UserCollection"] ?? "Auctioncollection name missing";
 
-        // Collection
-        _userCollection = database.GetCollection<User>(_config["CollectionName"]);
-        _logger.LogInformation($"[*] COLLECTION: {_config["CollectionName"]}");
+            _logger.LogInformation($"AuctionService secrets: ConnectionURI: {_connectionURI}");
+            _logger.LogInformation($"User Database and Collections: Database: {_usersDatabase}, Collection: {_userCollectionName}");
+
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("Error retrieving enviroment variables");
+
+            throw;
+        }
+
+        try
+        {
+            // Sets MongoDB client
+            var mongoClient = new MongoClient(_connectionURI);
+            _logger.LogInformation($"[*] CONNECTION_URI: {_config["ConnectionURI"]}");
+
+            // Sets MongoDB Database
+            var auctionsDatabase = mongoClient.GetDatabase(_usersDatabase);
+            _logger.LogInformation($"[*] DATABASE: {_config["DatabaseName"]}");
+
+            // Collections
+            _userCollection = auctionsDatabase.GetCollection<User>(_userCollectionName);
+            _logger.LogInformation($"[*] COLLECTION: {_config["CollectionName"]}");
+
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"Error trying to connect to database: {ex.Message}");
+            throw;
+        }
+
     }
 
     // Method to fetch a specific user from the userId.
@@ -47,7 +85,16 @@ public class MongoDBService : IUserRepository
 
             _logger.LogInformation($"[*] GetUserById(string userId) called: Fetching user information from userId: {user.UserId}");
 
-            return user;
+            if (user == null)
+            {
+                _logger.LogError($"Error finding user: {userId}");
+
+                return null;
+            }
+            else
+            {
+                return user;
+            }
         }
         catch (Exception ex)
         {
@@ -63,8 +110,20 @@ public class MongoDBService : IUserRepository
         {
             _logger.LogInformation($"[*] GetAllUsers() called: Fetching all users from the database.");
 
-            // Finds all users in the database and converts it to a list.
-            return await _userCollection.Find(new BsonDocument()).ToListAsync();
+            List<User> userList = new List<User>();
+
+            userList = await _userCollection.Find(new BsonDocument()).ToListAsync();
+
+            if (userList == null)
+            {
+                _logger.LogInformation("No users found");
+
+                return null;
+            }
+            else
+            {
+                return userList;
+            }
         }
         catch (Exception ex)
         {
@@ -82,6 +141,7 @@ public class MongoDBService : IUserRepository
 
             // Finds a user with the input UserId and deletes it.
             await _userCollection.DeleteOneAsync(u => u.UserId == userId);
+
         }
         catch (Exception ex)
         {
