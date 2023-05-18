@@ -17,7 +17,9 @@ namespace UsersServiceAPI.Service
         public Task UpdateUserPassword(string userId, UserDTO userDTO);
 
         public Task AddNewUser(UserDTO newUser);
-        
+
+        public Task<string> TestLoginUser(Login login);
+
     }
 
 }

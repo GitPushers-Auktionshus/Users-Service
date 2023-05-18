@@ -266,9 +266,40 @@ public class MongoDBService : IUserRepository
     // Using BCrypt-package to salt and hash a password string.
     public static string HashPassword(string password)
     {
-        string salt = BCrypt.Net.BCrypt.GenerateSalt();
+        string salt = "$2a$11$NnQ3D9KHpPr1UOjTo/2fXO";
         string hashedPassword = BCrypt.Net.BCrypt.HashPassword(password, salt);
 
+        Console.WriteLine($"Salt: {salt}");
+
         return hashedPassword;
+    }
+
+    public async Task<string> TestLoginUser(Login login)
+    {
+        User user = await _userCollection.Find(x => x.Username == login.Username).FirstOrDefaultAsync();
+
+        if (user == null)
+        {
+            return "User not found";
+        }
+        else 
+        {
+            string salt = "$2a$11$NnQ3D9KHpPr1UOjTo/2fXO";
+
+            _logger.LogInformation($"Salt: {salt}");
+
+            string hashedpassword = BCrypt.Net.BCrypt.HashPassword(login.Password, salt);
+
+            _logger.LogInformation($"Database PW: {user.Password}, Login PW: {hashedpassword}");
+
+            if (user.Password == hashedpassword)
+            {
+                return "Authorized";
+            }
+            else
+            {
+                return "Unauzthorized";
+            }
+        }
     }
 }
