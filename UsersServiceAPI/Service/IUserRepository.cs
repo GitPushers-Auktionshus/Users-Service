@@ -18,8 +18,6 @@ namespace UsersServiceAPI.Service
 
         public Task AddNewUser(UserDTO newUser);
 
-        public Task<string> TestLoginUser(Login login);
-
     }
 
 }

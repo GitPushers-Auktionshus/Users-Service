@@ -88,13 +88,4 @@ public class UsersController : ControllerBase
         return Ok($"New user has been added to the database: {newUser.FirstName} {newUser.LastName}");
     }
 
-    [HttpPost("testLogin")]
-    public async Task<string> TestLogin(Login login)
-    {
-        return await _mongoService.TestLoginUser(login);
-
-    }
-
-
-
 }

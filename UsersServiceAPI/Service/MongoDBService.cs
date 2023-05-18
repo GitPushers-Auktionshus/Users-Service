@@ -21,6 +21,8 @@ public class MongoDBService : IUserRepository
 
     private readonly string _connectionURI;
 
+    private readonly string _salt;
+
     private readonly string _usersDatabase;
 
     private readonly string _userCollectionName;
@@ -36,12 +38,13 @@ public class MongoDBService : IUserRepository
         {
             // Retrieves enviroment variables from program.cs, from injected EnviromentVariables class
             _connectionURI = vaultSecrets.dictionary["ConnectionURI"];
+            _salt = vaultSecrets.dictionary["Salt"];
 
             // Retrieves User database and collections
             _usersDatabase = config["UserDatabase"] ?? "Auctionsdatabase missing";
             _userCollectionName = config["UserCollection"] ?? "Auctioncollection name missing";
 
-            _logger.LogInformation($"AuctionService secrets: ConnectionURI: {_connectionURI}");
+            _logger.LogInformation($"AuctionService secrets: ConnectionURI: {_connectionURI}, Salt: {_salt}");
             _logger.LogInformation($"User Database and Collections: Database: {_usersDatabase}, Collection: {_userCollectionName}");
 
         }
@@ -209,7 +212,7 @@ public class MongoDBService : IUserRepository
             _logger.LogInformation($"Old: {existingUser.Password}");
 
             // Overwrites the current password with the new one
-            existingUser.Password = HashPassword(userDTO.Password);
+            existingUser.Password = HashPassword(userDTO.Password, _salt);
 
             _logger.LogInformation($"New: {existingUser.Password}");
 
@@ -242,7 +245,7 @@ public class MongoDBService : IUserRepository
                 Address = newUser.Address,
                 Phone = newUser.Phone,
                 Email = newUser.Email,
-                Password = HashPassword(newUser.Password),
+                Password = HashPassword(newUser.Password, _salt),
                 Verified = newUser.Verified,
                 Rating = Math.Round(newUser.Rating, 2), // Converts float to use only 1 decimal.
                 Username = newUser.Username
@@ -264,42 +267,12 @@ public class MongoDBService : IUserRepository
 
     // Method for password hashing.
     // Using BCrypt-package to salt and hash a password string.
-    public static string HashPassword(string password)
+    public static string HashPassword(string password, string salt)
     {
-        string salt = "$2a$11$NnQ3D9KHpPr1UOjTo/2fXO";
+        string hashSalt = salt;
         string hashedPassword = BCrypt.Net.BCrypt.HashPassword(password, salt);
-
-        Console.WriteLine($"Salt: {salt}");
 
         return hashedPassword;
     }
 
-    public async Task<string> TestLoginUser(Login login)
-    {
-        User user = await _userCollection.Find(x => x.Username == login.Username).FirstOrDefaultAsync();
-
-        if (user == null)
-        {
-            return "User not found";
-        }
-        else 
-        {
-            string salt = "$2a$11$NnQ3D9KHpPr1UOjTo/2fXO";
-
-            _logger.LogInformation($"Salt: {salt}");
-
-            string hashedpassword = BCrypt.Net.BCrypt.HashPassword(login.Password, salt);
-
-            _logger.LogInformation($"Database PW: {user.Password}, Login PW: {hashedpassword}");
-
-            if (user.Password == hashedpassword)
-            {
-                return "Authorized";
-            }
-            else
-            {
-                return "Unauzthorized";
-            }
-        }
-    }
 }
