@@ -50,7 +50,7 @@ public class MongoDBService : IUserRepository
         }
         catch (Exception ex)
         {
-            _logger.LogError("Error retrieving enviroment variables");
+            _logger.LogError($"Error retrieving enviroment variables {ex.Message}");
 
             throw;
         }
