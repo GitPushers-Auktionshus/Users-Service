@@ -29,7 +29,7 @@ public class MongoDBService : IUserRepository
 
     private readonly IMongoCollection<User> _userCollection;
 
-    public MongoDBService(IConfiguration config, ILogger<MongoDBService> logger, EnviromentVariables vaultSecrets)
+    public MongoDBService(IConfiguration config, ILogger<MongoDBService> logger, EnvVariables vaultSecrets)
     {
         _logger = logger;
         _config = config;
