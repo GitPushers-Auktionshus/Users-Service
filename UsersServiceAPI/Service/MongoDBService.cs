@@ -59,15 +59,15 @@ public class MongoDBService : IUserRepository
         {
             // Sets MongoDB client
             var mongoClient = new MongoClient(_connectionURI);
-            _logger.LogInformation($"[*] CONNECTION_URI: {_config["ConnectionURI"]}");
+            _logger.LogInformation($"[*] CONNECTION_URI: {_connectionURI}");
 
             // Sets MongoDB Database
             var auctionsDatabase = mongoClient.GetDatabase(_usersDatabase);
-            _logger.LogInformation($"[*] DATABASE: {_config["DatabaseName"]}");
+            _logger.LogInformation($"[*] DATABASE: {_usersDatabase}");
 
             // Collections
             _userCollection = auctionsDatabase.GetCollection<User>(_userCollectionName);
-            _logger.LogInformation($"[*] COLLECTION: {_config["CollectionName"]}");
+            _logger.LogInformation($"[*] COLLECTION: {_userCollectionName}");
 
         }
         catch (Exception ex)
