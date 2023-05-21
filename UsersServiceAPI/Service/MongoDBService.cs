@@ -41,8 +41,8 @@ public class MongoDBService : IUserRepository
             _salt = vaultSecrets.dictionary["Salt"];
 
             // Retrieves User database and collections
-            _usersDatabase = config["UserDatabase"] ?? "Auctionsdatabase missing";
-            _userCollectionName = config["UserCollection"] ?? "Auctioncollection name missing";
+            _usersDatabase = config["UsersDatabase"] ?? "UsersDatabase missing";
+            _userCollectionName = config["UserCollection"] ?? "UserCollection name missing";
 
             _logger.LogInformation($"AuctionService secrets: ConnectionURI: {_connectionURI}, Salt: {_salt}");
             _logger.LogInformation($"User Database and Collections: Database: {_usersDatabase}, Collection: {_userCollectionName}");
