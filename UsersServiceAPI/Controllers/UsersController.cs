@@ -38,6 +38,8 @@ public class UsersController : ControllerBase
     [HttpGet("getUser/{userId}")]
     public async Task<User> GetUser(string userId)
     {
+        _logger.LogInformation($"[GET] getUser endpoint reached");
+
         return await _mongoService.GetUserById(userId);
     }
 
@@ -46,6 +48,8 @@ public class UsersController : ControllerBase
     [HttpGet("getAllUsers")]
     public async Task<List<User>> GetAll()
     {
+        _logger.LogInformation($"[GET] getAllUsers endpoint reached");
+
         return await _mongoService.GetAllUsers();
     }
 
@@ -54,6 +58,8 @@ public class UsersController : ControllerBase
     [HttpDelete("deleteUser/{userId}")]
     public async Task<IActionResult> DeleteUser(string userId)
     {
+        _logger.LogInformation($"[DELETE] deleteUser/{userId} endpoint reached");
+
         await _mongoService.DeleteOneUser(userId);
 
         return Ok($"User with Id: {userId} has been deleted.");
@@ -64,6 +70,8 @@ public class UsersController : ControllerBase
     [HttpPut("updateUser/{userId}")]
     public async Task<IActionResult> UpdateUser(string userId, UserDTO userDTO)
     {
+        _logger.LogInformation($"[PUT] updateUser/{userId} endpoint reached");
+
         await _mongoService.UpdateOneUser(userId, userDTO);
 
         return Ok($"User with Id: {userId} has been updated in the database.");
@@ -74,6 +82,8 @@ public class UsersController : ControllerBase
     [HttpPut("updatePassword/{userId}")]
     public async Task<IActionResult> UpdatePassword(string userId, UserDTO userDTO)
     {
+        _logger.LogInformation($"[PUT] updatePassword/{userId} endpoint reached");
+
         await _mongoService.UpdateUserPassword(userId, userDTO);
 
         return Ok($"User with Id: {userId} has changed password");
@@ -83,6 +93,8 @@ public class UsersController : ControllerBase
     [HttpPost("addUser")]
     public async Task<IActionResult> AddUser(UserDTO newUser)
     {
+        _logger.LogInformation($"[POST] addUser endpoint reached");
+
         await _mongoService.AddNewUser(newUser);
 
         return Ok($"New user has been added to the database: {newUser.FirstName} {newUser.LastName}");
