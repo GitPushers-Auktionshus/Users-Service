@@ -144,7 +144,6 @@ public class MongoDBService : IUserRepository
 
             // Finds a user with the input UserId and deletes it.
             await _userCollection.DeleteOneAsync(u => u.UserId == userId);
-
         }
         catch (Exception ex)
         {
