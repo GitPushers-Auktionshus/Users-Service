@@ -29,7 +29,7 @@ public class MongoDBService : IUserRepository
 
     private readonly IMongoCollection<User> _userCollection;
 
-    public MongoDBService(IConfiguration config, ILogger<MongoDBService> logger, EnviromentVariables vaultSecrets)
+    public MongoDBService(IConfiguration config, ILogger<MongoDBService> logger, EnvVariables vaultSecrets)
     {
         _logger = logger;
         _config = config;
@@ -41,8 +41,8 @@ public class MongoDBService : IUserRepository
             _salt = vaultSecrets.dictionary["Salt"];
 
             // Retrieves User database and collections
-            _usersDatabase = config["UserDatabase"] ?? "Auctionsdatabase missing";
-            _userCollectionName = config["UserCollection"] ?? "Auctioncollection name missing";
+            _usersDatabase = config["UsersDatabase"] ?? "UsersDatabase missing";
+            _userCollectionName = config["UserCollection"] ?? "UserCollection name missing";
 
             _logger.LogInformation($"AuctionService secrets: ConnectionURI: {_connectionURI}, Salt: {_salt}");
             _logger.LogInformation($"User Database and Collections: Database: {_usersDatabase}, Collection: {_userCollectionName}");
@@ -50,7 +50,7 @@ public class MongoDBService : IUserRepository
         }
         catch (Exception ex)
         {
-            _logger.LogError("Error retrieving enviroment variables");
+            _logger.LogError($"Error retrieving enviroment variables {ex.Message}");
 
             throw;
         }
@@ -59,15 +59,15 @@ public class MongoDBService : IUserRepository
         {
             // Sets MongoDB client
             var mongoClient = new MongoClient(_connectionURI);
-            _logger.LogInformation($"[*] CONNECTION_URI: {_config["ConnectionURI"]}");
+            _logger.LogInformation($"[*] CONNECTION_URI: {_connectionURI}");
 
             // Sets MongoDB Database
             var auctionsDatabase = mongoClient.GetDatabase(_usersDatabase);
-            _logger.LogInformation($"[*] DATABASE: {_config["DatabaseName"]}");
+            _logger.LogInformation($"[*] DATABASE: {_usersDatabase}");
 
             // Collections
             _userCollection = auctionsDatabase.GetCollection<User>(_userCollectionName);
-            _logger.LogInformation($"[*] COLLECTION: {_config["CollectionName"]}");
+            _logger.LogInformation($"[*] COLLECTION: {_userCollectionName}");
 
         }
         catch (Exception ex)

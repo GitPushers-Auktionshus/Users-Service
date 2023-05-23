@@ -1,4 +1,4 @@
-namespace UserServiceAPI.Test;
+namespace UsersServiceAPI.Test;
 
 public class Tests
 {
