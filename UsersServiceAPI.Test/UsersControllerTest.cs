@@ -31,6 +31,7 @@ public class UsersControllerTest
             .Build();
     }
 
+    // Tests that the  method returns a CreatedAtActionResult object, when the user is created correctly
     [Test]
     public async Task TestAddUserEndpoint_valid_dto()
     {
@@ -52,6 +53,7 @@ public class UsersControllerTest
         Assert.That((result as CreatedAtActionResult)?.Value, Is.TypeOf<UserDTO>());
     }
 
+    // Tests that the method returns a BadRequestResult object, when the AddNewUser method fails / throws an exception
     [Test]
     public async Task TestAddUserEndpoint_failure_posting()
     {
