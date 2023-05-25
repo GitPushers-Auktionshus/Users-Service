@@ -47,7 +47,7 @@ namespace UsersServiceAPI.Service
         /// </summary>
         /// <param name="newUser"></param>
         /// <returns></returns>
-        public Task AddNewUser(UserDTO newUser);
+        public Task<UserDTO> AddNewUser(UserDTO newUser);
 
     }
 

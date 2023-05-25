@@ -229,39 +229,51 @@ public class MongoDBService : IUserRepository
     }
 
     // Method to add a new user to the database.
-    public async Task AddNewUser(UserDTO newUser)
+    public async Task<UserDTO> AddNewUser(UserDTO newUser)
     {
+        Task t;
+
         try
         {
-            _logger.LogInformation($"[*] AddNewUser(UserDTO newUser) called: Creating a new user.");
-
-            // Converts the UserDTO to a regular User object.
-            User user = new User
+            t = Task.Run(async() =>
             {
-                UserId = ObjectId.GenerateNewId().ToString(),
-                FirstName = newUser.FirstName,
-                LastName = newUser.LastName,
-                Address = newUser.Address,
-                Phone = newUser.Phone,
-                Email = newUser.Email,
-                Password = HashPassword(newUser.Password, _salt),
-                Verified = newUser.Verified,
-                Rating = Math.Round(newUser.Rating, 2), // Converts float to use only 1 decimal.
-                Username = newUser.Username
-            };
+                _logger.LogInformation($"[*] AddNewUser(UserDTO newUser) called: Creating a new user.");
 
-            // Logging userinformation.
-            _logger.LogInformation($"\n[*] New user added:\nUserId: {user.UserId}\nFull name: {user.FirstName} {user.LastName}\nPhone: {user.Phone}\nUsername: {user.Username}\nAddress: {user.Address}\nEmail: {user.Email}\nPassword: {user.Password}\nVerified: {user.Verified}\nRating: {user.Rating}");
+                newUser.UserId = ObjectId.GenerateNewId().ToString();
+                newUser.Password = HashPassword(newUser.Password, _salt);
+                newUser.Rating = Math.Round(newUser.Rating, 2);
 
-            await _userCollection.InsertOneAsync(user);
+                // Converts the UserDTO to a regular User object.
+                User user = new User
+                {
+                    UserId = newUser.UserId,
+                    FirstName = newUser.FirstName,
+                    LastName = newUser.LastName,
+                    Address = newUser.Address,
+                    Phone = newUser.Phone,
+                    Email = newUser.Email,
+                    Password = newUser.Password,
+                    Verified = newUser.Verified,
+                    Rating = newUser.Rating, // Converts float to use only 1 decimal.
+                    Username = newUser.Username
+                };
 
-            return;
+                // Logging userinformation.
+                //_logger.LogInformation($"\n[*] New user added:\nUserId: {user.UserId}\nFull name: {user.FirstName} {user.LastName}\nPhone: {user.Phone}\nUsername: {user.Username}\nAddress: {user.Address}\nEmail: {user.Email}\nPassword: {user.Password}\nVerified: {user.Verified}\nRating: {user.Rating}");
+
+                await _userCollection.InsertOneAsync(user);
+
+            });
+
+            await t;
         }
         catch (Exception ex)
         {
             _logger.LogError($"EXCEPTION CAUGHT: {ex.Message}");
             throw;
         }
+
+        return newUser;
     }
 
     // Method for password hashing.
