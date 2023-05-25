@@ -97,8 +97,8 @@ public class UsersController : ControllerBase
 
         try
         {
-           await _mongoService.AddNewUser(newUser);
-            return CreatedAtAction("GetUser", new { userId = newUser.UserId }, newUser);
+            User user = await _mongoService.AddNewUser(newUser);
+            return CreatedAtAction("GetUser", new { userId = user.UserId }, user);
         }
         catch (Exception ex)
         {

@@ -229,28 +229,24 @@ public class MongoDBService : IUserRepository
     }
 
     // Method to add a new user to the database.
-    public async Task<UserDTO> AddNewUser(UserDTO newUser)
+    public async Task<User> AddNewUser(UserDTO newUser)
     {
         try
         {
             _logger.LogInformation($"[*] AddNewUser(UserDTO newUser) called: Creating a new user.");
 
-            newUser.UserId = ObjectId.GenerateNewId().ToString();
-            newUser.Password = HashPassword(newUser.Password, _salt);
-            newUser.Rating = Math.Round(newUser.Rating, 2);
-
             // Converts the UserDTO to a regular User object.
             User user = new User
             {
-                UserId = newUser.UserId,
+                UserId = ObjectId.GenerateNewId().ToString(),
                 FirstName = newUser.FirstName,
                 LastName = newUser.LastName,
                 Address = newUser.Address,
                 Phone = newUser.Phone,
                 Email = newUser.Email,
-                Password = newUser.Password,
+                Password = HashPassword(newUser.Password, _salt),
                 Verified = newUser.Verified,
-                Rating = newUser.Rating, // Converts float to use only 1 decimal.
+                Rating = Math.Round(newUser.Rating, 2), // Converts float to use only 1 decimal.
                 Username = newUser.Username
             };
 
@@ -259,7 +255,7 @@ public class MongoDBService : IUserRepository
             // Logging userinformation.
             _logger.LogInformation($"\n[*] New user added:\nUserId: {user.UserId}\nFull name: {user.FirstName} {user.LastName}\nPhone: {user.Phone}\nUsername: {user.Username}\nAddress: {user.Address}\nEmail: {user.Email}\nPassword: {user.Password}\nVerified: {user.Verified}\nRating: {user.Rating}");
 
-            return newUser;
+            return user;
 
         }
         catch (Exception ex)

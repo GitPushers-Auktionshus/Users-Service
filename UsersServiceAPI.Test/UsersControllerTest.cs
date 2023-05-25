@@ -36,12 +36,13 @@ public class UsersControllerTest
     public async Task TestAddUserEndpoint_valid_dto()
     {
         // Arrange
-        var userDTO = CreateUser("TestUser");
-        
+        var userDTO = CreateUserDTO("TestUser");
+        var user = CreateUser("TestUser");
+
         var stubRepo = new Mock<IUserRepository>();
 
         stubRepo.Setup(svc => svc.AddNewUser(userDTO))
-            .Returns(Task.FromResult<UserDTO?>(userDTO));
+            .Returns(Task.FromResult<User?>(user));
 
         var controller = new UsersController(_logger, _configuration, stubRepo.Object);
 
@@ -50,7 +51,7 @@ public class UsersControllerTest
 
         // Assert
         Assert.That(result, Is.TypeOf<CreatedAtActionResult>());
-        Assert.That((result as CreatedAtActionResult)?.Value, Is.TypeOf<UserDTO>());
+        Assert.That((result as CreatedAtActionResult)?.Value, Is.TypeOf<User>());
     }
 
     // Tests that the method returns a BadRequestResult object, when the AddNewUser method fails / throws an exception
@@ -58,7 +59,8 @@ public class UsersControllerTest
     public async Task TestAddUserEndpoint_failure_posting()
     {
         // Arrange
-        var userDTO = CreateUser("TestUser");
+        var userDTO = CreateUserDTO("TestUser");
+        var user = CreateUser("TestUser");
 
         var stubRepo = new Mock<IUserRepository>();
 
@@ -79,7 +81,7 @@ public class UsersControllerTest
     /// </summary>
     /// <param name="username"></param>
     /// <returns></returns>
-    private UserDTO CreateUser(string username)
+    private UserDTO CreateUserDTO(string username)
     {
         var userDTO = new UserDTO()
         {
@@ -95,5 +97,29 @@ public class UsersControllerTest
         };
 
         return userDTO;
+    }
+
+    /// <summary>
+    /// Helper method for creating UserDTO instance.
+    /// </summary>
+    /// <param name="username"></param>
+    /// <returns></returns>
+    private User CreateUser(string username)
+    {
+        var user = new User()
+        {
+            UserId = "1",
+            Username = username,
+            FirstName = "Test FirstName",
+            LastName = "Test LastName",
+            Address = "Test Address",
+            Phone = "Test Phone",
+            Email = "Test Email",
+            Password = "Test Password",
+            Verified = true,
+            Rating = 0
+        };
+
+        return user;
     }
 }
