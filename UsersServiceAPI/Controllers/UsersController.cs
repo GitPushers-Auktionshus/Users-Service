@@ -95,16 +95,17 @@ public class UsersController : ControllerBase
     {
         _logger.LogInformation($"[POST] addUser endpoint reached");
 
-        var res = _mongoService.AddNewUser(newUser);
-
-        if (res.IsFaulted)
+        try
         {
+           await _mongoService.AddNewUser(newUser);
+            return CreatedAtAction("GetUser", new { userId = newUser.UserId }, newUser);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while adding a new user.");
             return BadRequest();
         }
 
-        return CreatedAtAction("Get", new { id = newUser.UserId }, newUser);
-
-        //return Ok($"New user has been added to the database: {newUser.FirstName} {newUser.LastName}");
     }
 
 }

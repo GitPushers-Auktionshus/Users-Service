@@ -148,7 +148,7 @@ public class MongoDBService : IUserRepository
         catch (Exception ex)
         {
             _logger.LogError($"EXCEPTION CAUGHT: {ex.Message}");
-            throw;          
+            throw;
         }
     }
 
@@ -188,7 +188,7 @@ public class MongoDBService : IUserRepository
         catch (Exception ex)
         {
             _logger.LogError($"EXCEPTION CAUGHT: {ex.Message}");
-            throw;   
+            throw;
         }
     }
 
@@ -224,56 +224,49 @@ public class MongoDBService : IUserRepository
         catch (Exception ex)
         {
             _logger.LogError($"EXCEPTION CAUGHT: {ex.Message}");
-            throw;   
+            throw;
         }
     }
 
     // Method to add a new user to the database.
     public async Task<UserDTO> AddNewUser(UserDTO newUser)
     {
-        Task t;
-
         try
         {
-            t = Task.Run(async() =>
+            _logger.LogInformation($"[*] AddNewUser(UserDTO newUser) called: Creating a new user.");
+
+            newUser.UserId = ObjectId.GenerateNewId().ToString();
+            newUser.Password = HashPassword(newUser.Password, _salt);
+            newUser.Rating = Math.Round(newUser.Rating, 2);
+
+            // Converts the UserDTO to a regular User object.
+            User user = new User
             {
-                _logger.LogInformation($"[*] AddNewUser(UserDTO newUser) called: Creating a new user.");
+                UserId = newUser.UserId,
+                FirstName = newUser.FirstName,
+                LastName = newUser.LastName,
+                Address = newUser.Address,
+                Phone = newUser.Phone,
+                Email = newUser.Email,
+                Password = newUser.Password,
+                Verified = newUser.Verified,
+                Rating = newUser.Rating, // Converts float to use only 1 decimal.
+                Username = newUser.Username
+            };
 
-                newUser.UserId = ObjectId.GenerateNewId().ToString();
-                newUser.Password = HashPassword(newUser.Password, _salt);
-                newUser.Rating = Math.Round(newUser.Rating, 2);
+            await _userCollection.InsertOneAsync(user);
 
-                // Converts the UserDTO to a regular User object.
-                User user = new User
-                {
-                    UserId = newUser.UserId,
-                    FirstName = newUser.FirstName,
-                    LastName = newUser.LastName,
-                    Address = newUser.Address,
-                    Phone = newUser.Phone,
-                    Email = newUser.Email,
-                    Password = newUser.Password,
-                    Verified = newUser.Verified,
-                    Rating = newUser.Rating, // Converts float to use only 1 decimal.
-                    Username = newUser.Username
-                };
+            // Logging userinformation.
+            _logger.LogInformation($"\n[*] New user added:\nUserId: {user.UserId}\nFull name: {user.FirstName} {user.LastName}\nPhone: {user.Phone}\nUsername: {user.Username}\nAddress: {user.Address}\nEmail: {user.Email}\nPassword: {user.Password}\nVerified: {user.Verified}\nRating: {user.Rating}");
 
-                // Logging userinformation.
-                //_logger.LogInformation($"\n[*] New user added:\nUserId: {user.UserId}\nFull name: {user.FirstName} {user.LastName}\nPhone: {user.Phone}\nUsername: {user.Username}\nAddress: {user.Address}\nEmail: {user.Email}\nPassword: {user.Password}\nVerified: {user.Verified}\nRating: {user.Rating}");
+            return newUser;
 
-                await _userCollection.InsertOneAsync(user);
-
-            });
-
-            await t;
         }
         catch (Exception ex)
         {
             _logger.LogError($"EXCEPTION CAUGHT: {ex.Message}");
             throw;
         }
-
-        return newUser;
     }
 
     // Method for password hashing.
