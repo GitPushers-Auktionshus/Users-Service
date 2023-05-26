@@ -148,7 +148,7 @@ public class MongoDBService : IUserRepository
         catch (Exception ex)
         {
             _logger.LogError($"EXCEPTION CAUGHT: {ex.Message}");
-            throw;          
+            throw;
         }
     }
 
@@ -188,7 +188,7 @@ public class MongoDBService : IUserRepository
         catch (Exception ex)
         {
             _logger.LogError($"EXCEPTION CAUGHT: {ex.Message}");
-            throw;   
+            throw;
         }
     }
 
@@ -224,12 +224,12 @@ public class MongoDBService : IUserRepository
         catch (Exception ex)
         {
             _logger.LogError($"EXCEPTION CAUGHT: {ex.Message}");
-            throw;   
+            throw;
         }
     }
 
     // Method to add a new user to the database.
-    public async Task AddNewUser(UserDTO newUser)
+    public async Task<User> AddNewUser(UserDTO newUser)
     {
         try
         {
@@ -250,12 +250,13 @@ public class MongoDBService : IUserRepository
                 Username = newUser.Username
             };
 
+            await _userCollection.InsertOneAsync(user);
+
             // Logging userinformation.
             _logger.LogInformation($"\n[*] New user added:\nUserId: {user.UserId}\nFull name: {user.FirstName} {user.LastName}\nPhone: {user.Phone}\nUsername: {user.Username}\nAddress: {user.Address}\nEmail: {user.Email}\nPassword: {user.Password}\nVerified: {user.Verified}\nRating: {user.Rating}");
 
-            await _userCollection.InsertOneAsync(user);
+            return user;
 
-            return;
         }
         catch (Exception ex)
         {
