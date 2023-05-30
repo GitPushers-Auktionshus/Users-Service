@@ -49,6 +49,13 @@ namespace UsersServiceAPI.Service
         /// <returns></returns>
         public Task<User> AddNewUser(UserDTO newUser);
 
+        /// <summary>
+        /// Adds a new auctionhouse to the database.
+        /// </summary>
+        /// <param name="newAuctionhouse"></param>
+        /// <returns></returns>
+        public Task<Auctionhouse> AddNewAuctionhouse(AuctionhouseDTO newAuctionhouse);
+
     }
 
 }

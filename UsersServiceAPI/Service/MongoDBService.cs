@@ -26,8 +26,10 @@ public class MongoDBService : IUserRepository
     private readonly string _usersDatabase;
 
     private readonly string _userCollectionName;
+    private readonly string _auctionHouseCollectionName;
 
     private readonly IMongoCollection<User> _userCollection;
+    private readonly IMongoCollection<Auctionhouse> _auctionHouseCollection;
 
     public MongoDBService(IConfiguration config, ILogger<MongoDBService> logger, EnvVariables vaultSecrets)
     {
@@ -42,10 +44,13 @@ public class MongoDBService : IUserRepository
 
             // Retrieves User database and collections
             _usersDatabase = config["UsersDatabase"] ?? "UsersDatabase missing";
+
+            // Retrieves User and Auctionhouse collections
             _userCollectionName = config["UserCollection"] ?? "UserCollection name missing";
+            _auctionHouseCollectionName = config["AuctionHouseCollection"] ?? "AuctionHouseCollection name missing";
 
             _logger.LogInformation($"AuctionService secrets: ConnectionURI: {_connectionURI}, Salt: {_salt}");
-            _logger.LogInformation($"User Database and Collections: Database: {_usersDatabase}, Collection: {_userCollectionName}");
+            _logger.LogInformation($"User and Auctionshouse Database and Collections: Database: {_usersDatabase}, User Collection: {_userCollectionName}, Auctionhouse Collection: {_auctionHouseCollectionName}");
 
         }
         catch (Exception ex)
@@ -68,6 +73,10 @@ public class MongoDBService : IUserRepository
             // Collections
             _userCollection = auctionsDatabase.GetCollection<User>(_userCollectionName);
             _logger.LogInformation($"[*] COLLECTION: {_userCollectionName}");
+
+            _auctionHouseCollection = auctionsDatabase.GetCollection<Auctionhouse>(_auctionHouseCollectionName);
+            _logger.LogInformation($"[*] COLLECTION: {_auctionHouseCollectionName}");
+
 
         }
         catch (Exception ex)
@@ -228,8 +237,37 @@ public class MongoDBService : IUserRepository
         }
     }
 
-    // Method to add a new user to the database.
-    public async Task<User> AddNewUser(UserDTO newUser)
+    // Method to add a new auctionhouse to the database.
+    public async Task<Auctionhouse> AddNewAuctionhouse(AuctionhouseDTO newAuctionhouse)
+    {
+        try
+        {
+            _logger.LogInformation($"[*] AddNewAuctionhouse(AuctionhouseDTO newAuctionhouse) called: Creating a new auctionhouse.");
+
+            Auctionhouse auctionhouse = new Auctionhouse
+            {
+                AuctionhouseID = ObjectId.GenerateNewId().ToString(),
+                Name = newAuctionhouse.Name,
+                Address = newAuctionhouse.Address,
+                CvrNumber = newAuctionhouse.CvrNumber
+            };
+
+            await _auctionHouseCollection.InsertOneAsync(auctionhouse);
+
+            // Logging userinformation.
+            _logger.LogInformation($"\n[*] New Auctionhouse added:\nUAuctionhouseID: {auctionhouse.AuctionhouseID}\nUName: {auctionhouse.Name}\nUAddress: {auctionhouse.Address}\nCVRnumber: {auctionhouse.CvrNumber}");
+
+            return auctionhouse;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"EXCEPTION CAUGHT: {ex.Message}");
+            throw;
+        }
+    }
+
+        // Method to add a new user to the database.
+        public async Task<User> AddNewUser(UserDTO newUser)
     {
         try
         {
