@@ -255,7 +255,7 @@ public class MongoDBService : IUserRepository
             await _auctionHouseCollection.InsertOneAsync(auctionhouse);
 
             // Logging userinformation.
-            _logger.LogInformation($"\n[*] New Auctionhouse added:\nUAuctionhouseID: {auctionhouse.AuctionhouseID}\nUName: {auctionhouse.Name}\nUAddress: {auctionhouse.Address}\nCVRnumber: {auctionhouse.CvrNumber}");
+            _logger.LogInformation($"\n[*] New Auctionhouse added:\nAuctionhouseID: {auctionhouse.AuctionhouseID}\nName: {auctionhouse.Name}\nAddress: {auctionhouse.Address}\nCVRnumber: {auctionhouse.CvrNumber}");
 
             return auctionhouse;
         }
