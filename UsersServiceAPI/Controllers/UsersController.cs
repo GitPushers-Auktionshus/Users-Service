@@ -108,4 +108,26 @@ public class UsersController : ControllerBase
 
     }
 
+    // POST - Adds an auctionhouse to the database.
+    [HttpPost("addUser")]
+    public async Task<IActionResult> AddAuctionHouse(AuctionhouseDTO newAuctionhouse)
+    {
+        _logger.LogInformation($"[POST] addAuctionhouse endpoint reached");
+
+        try
+        {
+            Auctionhouse auctionhouse = await _mongoService.AddNewAuctionhouse(newAuctionhouse);
+            return new ObjectResult(auctionhouse)
+            {
+                StatusCode = 201
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while adding a new user.");
+            return BadRequest();
+        }
+
+    }
+
 }
