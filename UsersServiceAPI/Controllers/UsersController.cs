@@ -109,7 +109,7 @@ public class UsersController : ControllerBase
     }
 
     // POST - Adds an auctionhouse to the database.
-    [HttpPost("addUser")]
+    [HttpPost("addAuctionhouse")]
     public async Task<IActionResult> AddAuctionHouse(AuctionhouseDTO newAuctionhouse)
     {
         _logger.LogInformation($"[POST] addAuctionhouse endpoint reached");
