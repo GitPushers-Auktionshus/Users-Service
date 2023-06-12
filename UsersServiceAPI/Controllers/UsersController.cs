@@ -130,11 +130,4 @@ public class UsersController : ControllerBase
 
     }
 
-    // GET - Fetches a user from the database by Id.
-    [HttpGet("/")]
-    public StatusCodeResult Test()
-    {
-        return StatusCode(201);
-    }
-
 }
